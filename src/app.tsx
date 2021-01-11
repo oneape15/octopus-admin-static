@@ -3,6 +3,7 @@ import { BasicLayoutProps, Settings as LayoutSettings } from '@ant-design/pro-la
 import { notification } from 'antd';
 import { history, RequestConfig } from 'umi';
 import RightContent from '@/components/RightContent';
+import { LOGIN_URL } from '@/utils/utils';
 import Footer from '@/components/Footer';
 import { ResponseError } from 'umi-request';
 import { queryCurrent } from './services/user';
@@ -16,14 +17,14 @@ export async function getInitialState(): Promise<{
   const fetchUserInfo = async () => {
     try {
       const currentUser = await queryCurrent();
-      return currentUser;
+      return currentUser.data;
     } catch (error) {
-      history.push('/user/login');
+      history.push(LOGIN_URL);
     }
     return undefined;
   };
   // 如果是登录页面，不执行
-  if (history.location.pathname !== '/user/login') {
+  if (history.location.pathname !== LOGIN_URL) {
     const currentUser = await fetchUserInfo();
     return {
       fetchUserInfo,
@@ -47,11 +48,15 @@ export const layout = ({
     disableContentMargin: false,
     footerRender: () => <Footer />,
     onPageChange: () => {
-      const { currentUser } = initialState;
-      const { location } = history;
-      // 如果没有登录，重定向到 login
-      if (!currentUser && location.pathname !== '/user/login') {
-        history.push('/user/login');
+      if (initialState) {
+        const { currentUser } = initialState;
+        const { location } = history;
+        // 如果没有登录，重定向到 login
+        if (!currentUser && location.pathname !== LOGIN_URL) {
+          history.push(LOGIN_URL);
+        }
+      } else {
+        history.push(LOGIN_URL);
       }
     },
     menuHeaderRender: undefined,

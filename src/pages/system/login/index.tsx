@@ -5,7 +5,8 @@ import { Link, SelectLang, history } from 'umi';
 import logo from '@/assets/logo.svg';
 import { LoginParamsType, fakeAccountLogin } from '@/services/login';
 import Footer from '@/components/Footer';
-import LoginFrom from './components/Login';
+import LoginFrom from './components';
+import { Md5 } from 'md5-typescript';
 import styles from './style.less';
 
 const { Tab, Username, Password, Mobile, Captcha, Submit } = LoginFrom;
@@ -33,30 +34,36 @@ const goto = () => {
 };
 
 const Login: React.FC<{}> = () => {
-  const [userLoginState, setUserLoginState] = useState<API.LoginStateType>({});
+  const [userLoginState, setUserLoginState] = useState<API.StateType>();
   const [submitting, setSubmitting] = useState(false);
   const [autoLogin, setAutoLogin] = useState(true);
   const [type, setType] = useState<string>('account');
   const handleSubmit = async (values: LoginParamsType) => {
     setSubmitting(true);
     try {
+      values.password = Md5.init(Md5.init(values.password).toLocaleLowerCase() + values.username)
       // 登录
-      const msg = await fakeAccountLogin({ ...values, type });
-      if (msg.status === 'ok') {
+      const retObj = await fakeAccountLogin({ ...values, type });
+      const { code, data } = retObj;
+      let token;
+      if (data) {
+        token = data;
+      }
+      if (code === 200 && token) {
         message.success('登录成功！');
+        localStorage.setItem('token', token);
         goto();
         return;
       }
       // 如果失败去设置用户错误信息
-      setUserLoginState(msg);
+      setUserLoginState(retObj);
     } catch (error) {
       message.error('登录失败，请重试！');
     }
     setSubmitting(false);
   };
-
-  const { status, type: loginType } = userLoginState;
-
+  const code = userLoginState?.code;
+  const msg = userLoginState?.msg;
   return (
     <div className={styles.container}>
       <div className={styles.lang}>
@@ -76,8 +83,8 @@ const Login: React.FC<{}> = () => {
         <div className={styles.main}>
           <LoginFrom activeKey={type} onTabChange={setType} onSubmit={handleSubmit}>
             <Tab key="account" tab="账户密码登录">
-              {status === 'error' && loginType === 'account' && !submitting && (
-                <LoginMessage content="账户或密码错误（admin/ant.design）" />
+              {code && code !== 200 && !submitting && (
+                <LoginMessage content={msg ? msg : "账户或密码错误"} />
               )}
 
               <Username
@@ -102,8 +109,8 @@ const Login: React.FC<{}> = () => {
               />
             </Tab>
             <Tab key="mobile" tab="手机号登录">
-              {status === 'error' && loginType === 'mobile' && !submitting && (
-                <LoginMessage content="验证码错误" />
+              {code && code !== 200 && !submitting && (
+                <LoginMessage content={msg ? msg : "验证码错误"} />
               )}
               <Mobile
                 name="mobile"

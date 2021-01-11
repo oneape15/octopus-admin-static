@@ -3,6 +3,7 @@ import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons
 import { Avatar, Menu, Spin } from 'antd';
 import { history, useModel } from 'umi';
 import { outLogin } from '@/services/login';
+import { LOGIN_URL } from '@/utils/utils';
 import { stringify } from 'querystring';
 import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
@@ -19,9 +20,9 @@ const loginOut = async () => {
   const { query, pathname } = history.location;
   const { redirect } = query;
   // Note: There may be security issues, please note
-  if (window.location.pathname !== '/user/login' && !redirect) {
+  if (window.location.pathname !== LOGIN_URL && !redirect) {
     history.replace({
-      pathname: '/user/login',
+      pathname: LOGIN_URL,
       search: stringify({
         redirect: pathname,
       }),
@@ -65,10 +66,10 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
   if (!initialState) {
     return loading;
   }
-
+  
   const { currentUser } = initialState;
 
-  if (!currentUser || !currentUser.name) {
+  if (!currentUser || !currentUser.nickname) {
     return loading;
   }
 
@@ -98,7 +99,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
     <HeaderDropdown overlay={menuHeaderDropdown}>
       <span className={`${styles.action} ${styles.account}`}>
         <Avatar size="small" className={styles.avatar} src={currentUser.avatar} alt="avatar" />
-        <span className={`${styles.name} anticon`}>{currentUser.name}</span>
+        <span className={`${styles.name} anticon`}>{currentUser.nickname}</span>
       </span>
     </HeaderDropdown>
   );

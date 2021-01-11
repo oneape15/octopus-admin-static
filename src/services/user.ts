@@ -1,11 +1,11 @@
-import { request } from 'umi';
+import request from '@/utils/request';
 
 export async function query() {
   return request<API.CurrentUser[]>('/api/users');
 }
 
 export async function queryCurrent() {
-  return request<API.CurrentUser>('/api/currentUser');
+  return request<API.MsgBody<API.CurrentUser>>('/api/account/currentUser');
 }
 
 export async function queryNotices(): Promise<any> {

@@ -1,4 +1,4 @@
-import { request } from 'umi';
+import request from '@/utils/request';
 
 export interface LoginParamsType {
   username: string;
@@ -9,7 +9,7 @@ export interface LoginParamsType {
 }
 
 export async function fakeAccountLogin(params: LoginParamsType) {
-  return request<API.LoginStateType>('/api/login/account', {
+  return request<API.StateType>('/api/account/login', {
     method: 'POST',
     data: params,
   });
@@ -20,5 +20,5 @@ export async function getFakeCaptcha(mobile: string) {
 }
 
 export async function outLogin() {
-  return request('/api/login/outLogin');
+  return request('/api/account/outLogin');
 }

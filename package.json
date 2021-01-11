@@ -95,6 +95,7 @@
         "gh-pages": "^3.0.0",
         "jsdom-global": "^3.0.2",
         "lint-staged": "^10.0.0",
+        "md5-typescript": "^1.0.5",
         "mockjs": "^1.0.1-beta3",
         "prettier": "^2.0.1",
         "pro-download": "1.0.1",
