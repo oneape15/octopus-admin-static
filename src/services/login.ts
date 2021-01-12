@@ -1,3 +1,4 @@
+import { ApiBody } from './Global';
 import request from '@/utils/request';
 
 export interface LoginParamsType {
@@ -9,7 +10,7 @@ export interface LoginParamsType {
 }
 
 export async function fakeAccountLogin(params: LoginParamsType) {
-  return request<API.StateType>('/api/account/login', {
+  return request<ApiBody<string>>('/api/account/login', {
     method: 'POST',
     data: params,
   });
@@ -20,5 +21,5 @@ export async function getFakeCaptcha(mobile: string) {
 }
 
 export async function outLogin() {
-  return request('/api/account/outLogin');
+  return request<ApiBody<string>>('/api/account/logout', { method: 'POST' });
 }

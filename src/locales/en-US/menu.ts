@@ -10,6 +10,7 @@ export default {
   'menu.dw': 'Data Warehouse',
   'menu.dw.term': 'Proper Noun',
   'menu.dw.datasource': 'Data Source',
+  'menu.dw.schema': 'Schema',
   'menu.dw.dataindex': 'Data index',
   'menu.serve': 'Serve',
   'menu.serve.list': 'Serve List',

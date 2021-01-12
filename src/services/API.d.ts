@@ -1,15 +1,5 @@
 declare namespace API {
 
-  export interface MsgBody<T> {
-    code: number;
-    msg?: string;
-    data?: T
-  }
-
-  export interface PageInfo<T> {
-    total?: number;
-    data?: T[]
-  }
   /**
    * 基础信息
    */
@@ -22,10 +12,19 @@ declare namespace API {
   }
 
   /**
-   * 数据源信息
+   * 查询基础参数
+   */
+  export interface BaseQueryParams {
+    pageSize?: number;
+    current?: number;
+    filter?: { [key: string]: any[] };
+    sorter?: { [key: string]: any };
+  }
+
+  /**
+   * 数据源对象
    */
   export interface DataSoureItem extends BaseItem {
-    id: number;
     name: string;
     type: string;
     status: number;
@@ -44,12 +43,19 @@ declare namespace API {
     comment?: string;
   }
 
-  export interface DataSourceParams {
+  export interface TableSchemaItem extends BaseItem {
+    schemaName: string;
+    name: string;
+    alias?: string;
+  }
+
+  export interface DataSourceType {
+    type: string;
+    driver: string;
+  }
+
+  export interface DataSourceParams extends BaseQueryParams {
     name?: string;
-    pageSize?: number;
-    current?: number;
-    filter?: { [key: string]: any[] };
-    sorter?: { [key: string]: any };
   }
 
   export interface CurrentUser {
@@ -68,12 +74,6 @@ declare namespace API {
     deptId?: number;
     access?: 'user' | 'guest' | 'admin';
     unreadCount?: number;
-  }
-
-  export interface StateType {
-    code: number;
-    data?: {},
-    msg?: string;
   }
 
   export interface NoticeIconData {

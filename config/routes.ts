@@ -59,6 +59,11 @@ export default [
         component: './dw/datasource'
       },
       {
+        path: '/dw/schema',
+        name: 'schema',
+        component: './dw/schema'
+      },
+      {
         path: '/dw/term',
         name: 'term',
       },

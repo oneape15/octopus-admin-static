@@ -4,12 +4,18 @@ import { Button, message, Modal } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
 
-import { queryDataSource, saveDataSource, changeDataSourceStatus, syncSchema } from '@/services/datasource';
+import {
+  queryDataSource,
+  saveDataSource,
+  changeDataSourceStatus,
+  syncSchema,
+  delDataSoure,
+} from '@/services/datasource';
 import DataSoureForm from './components/DataSourceForm';
 import OptionDropdown, { BTNS_KEY } from '@/components/OptionDropdown';
 
 /**
- * 添加节点
+ * 保存数据源
  * @param fields
  */
 const handleSave = async (fields: API.DataSoureItem) => {
@@ -32,6 +38,11 @@ const handleSave = async (fields: API.DataSoureItem) => {
   }
 };
 
+/**
+ * 修改数据源状态
+ * @param id 
+ * @param status 
+ */
 const handleStatus = async (id: number, status: number) => {
   const tag = status === 0 ? '启用' : '禁用';
   const hide = message.loading(`正在${tag}...`);
@@ -52,6 +63,10 @@ const handleStatus = async (id: number, status: number) => {
   }
 }
 
+/**
+ * 执行同步操作
+ * @param id 
+ */
 const handleSync = async (id: number) => {
   const hide = message.loading(`正在执行同步...`);
   try {
@@ -71,20 +86,43 @@ const handleSync = async (id: number) => {
   }
 }
 
-const DataSoureManagePage: React.FC<{}> = () => {
+/**
+ * 删除数据源操作
+ * @param id 
+ */
+const handleDel = async (params: { id: number }) => {
+  const hide = message.loading(`正在删除数据源...`);
+  try {
+    const ret = await delDataSoure(params);
+    hide();
+    if (ret.code === 200) {
+      message.success(`删除成功`);
+      return true;
+    } else {
+      message.error(ret.msg);
+      return false;
+    }
+  } catch (error) {
+    hide();
+    message.error(`删除失败请重试！`);
+    return false;
+  }
+}
+
+const DataSourceManagePage: React.FC<{}> = () => {
   const [formVisible, handleFormVisible] = useState<boolean>(false);
+  const [delModalVisible, handleDelModalVisible] = useState<boolean>(false);
   const [editFlag, setEditFlag] = useState<boolean>(false);
-  const [editValue, setEditValue] = useState({});
+  const [optValue, setOptValue] = useState<API.DataSoureItem>();
   const actionRef = useRef<ActionType>();
-  const [modal] = Modal.useModal();
 
   const columns: ProColumns<API.DataSoureItem>[] = [
     { title: '数据源名称', dataIndex: 'name' },
     {
       title: '类型', dataIndex: 'type', valueEnum: {
-        MySQL: { text: 'MySQL', status: 'Default' },
-        PostgreSQL: { text: 'PostgreSQL', status: 'Success' },
-        ODPS: { text: 'ODPS', status: 'Error' },
+        MySQL: { text: 'MySQL' },
+        PostgreSQL: { text: 'PostgreSQL' },
+        ODPS: { text: 'ODPS' },
       }
     },
     { title: 'URL', dataIndex: 'jdbcUrl' },
@@ -130,10 +168,11 @@ const DataSoureManagePage: React.FC<{}> = () => {
               case BTNS_KEY.EDIT:
                 handleFormVisible(true);
                 setEditFlag(true);
-                setEditValue(record);
+                setOptValue(record);
                 break;
               case BTNS_KEY.DEL:
-
+                handleDelModalVisible(true);
+                setOptValue(record);
                 break;
               case BTNS_KEY.SYNC:
                 handleSync(id);
@@ -158,7 +197,6 @@ const DataSoureManagePage: React.FC<{}> = () => {
     <PageContainer>
       <div style={{ display: formVisible ? 'none' : 'block' }}>
         <ProTable<API.DataSoureItem>
-          size="small"
           actionRef={actionRef}
           rowKey="id"
           columns={columns}
@@ -171,9 +209,7 @@ const DataSoureManagePage: React.FC<{}> = () => {
           </Button>
           ]}
           request={async (params, sorter, filter) => {
-            const msgBody = await queryDataSource({ ...params, sorter, filter });
-            console.log(msgBody);
-            const { list, total, } = msgBody.data;
+            const { code, data: { list, total }, msg } = await queryDataSource({ ...params, sorter, filter });
             let pageInfo = {
               data: list,
               total: total
@@ -186,11 +222,11 @@ const DataSoureManagePage: React.FC<{}> = () => {
         <DataSoureForm
           formVisible={formVisible}
           editFlag={editFlag}
-          values={editValue}
+          values={optValue}
           onCancel={() => {
             handleFormVisible(false);
             setEditFlag(false);
-            setEditValue({});
+            setOptValue(undefined);
 
           }}
           onSubmit={async (value) => {
@@ -198,7 +234,7 @@ const DataSoureManagePage: React.FC<{}> = () => {
             if (success) {
               handleFormVisible(false);
               setEditFlag(false);
-              setEditValue({});
+              setOptValue(undefined);
               if (actionRef.current) {
                 actionRef.current.reload();
               }
@@ -206,8 +242,32 @@ const DataSoureManagePage: React.FC<{}> = () => {
           }}
         />
       </div>
+      <Modal
+        title="删除操作"
+        visible={delModalVisible}
+        okText="确认"
+        cancelText="取消"
+        width="320px"
+        onCancel={() => {
+          setOptValue(undefined);
+          handleDelModalVisible(false);
+        }}
+        onOk={() => {
+          const id = optValue?.id ? optValue?.id : -1;
+          const status = handleDel({ id });
+          if (status) {
+            setOptValue(undefined);
+            handleDelModalVisible(false);
+            if (actionRef.current) {
+              actionRef.current.reload();
+            }
+          };
+        }}
+      >
+        <p>确认删除数据源： {optValue?.name}</p>
+      </Modal>
     </PageContainer>
   );
 }
 
-export default DataSoureManagePage;
+export default DataSourceManagePage;

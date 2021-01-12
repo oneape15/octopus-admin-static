@@ -1,4 +1,4 @@
-import { AlipayCircleOutlined, TaobaoCircleOutlined, WeiboCircleOutlined } from '@ant-design/icons';
+import { AlipayCircleOutlined, WeiboCircleOutlined } from '@ant-design/icons';
 import { Alert, Checkbox, message } from 'antd';
 import React, { useState } from 'react';
 import { Link, SelectLang, history } from 'umi';
@@ -34,7 +34,7 @@ const goto = () => {
 };
 
 const Login: React.FC<{}> = () => {
-  const [userLoginState, setUserLoginState] = useState<API.StateType>();
+  const [userLoginState, setUserLoginState] = useState<API.MsgBody>();
   const [submitting, setSubmitting] = useState(false);
   const [autoLogin, setAutoLogin] = useState(true);
   const [type, setType] = useState<string>('account');

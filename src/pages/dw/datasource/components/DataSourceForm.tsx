@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 import {
   Form, Input, Button, InputNumber, Radio, Row,
-  Col, Divider
+  Col, Divider,
+  message,
 } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
+import { testDataSource } from '@/services/datasource';
 
 const { Item } = Form;
 
@@ -14,6 +16,25 @@ export interface DataSourceFormProps {
   editFlag: boolean;
   values?: Partial<API.DataSoureItem>;
 }
+
+const dataSourceCheck = async (fields: API.DataSoureItem) => {
+  const hide = message.loading('正在检测中...');
+  try {
+    const ret = await testDataSource({ ...fields });
+    hide();
+    if (ret.code === 200) {
+      message.success('数据源配置可用。');
+      return true;
+    } else {
+      message.error(ret.msg);
+      return false;
+    }
+  } catch (error) {
+    hide();
+    message.error('检测失败请重试！');
+    return false;
+  }
+};
 
 const formItemLayout = {
   labelCol: {
@@ -139,7 +160,7 @@ const DataSoureForm: React.FC<DataSourceFormProps> = (props) => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Button>检测</Button>
+              <Button onClick={() => dataSourceCheck(form.getFieldsValue())}>检测</Button>
             </Col>
           </Row>
         </Item>
