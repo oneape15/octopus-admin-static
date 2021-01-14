@@ -1,23 +1,30 @@
 import React, { useEffect } from 'react';
 import {
-  Form, Input, Button, InputNumber, Radio, Row,
-  Col, Divider,
+  Form,
+  Input,
+  Button,
+  InputNumber,
+  Radio,
+  Row,
+  Col,
+  Divider,
   message,
 } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { testDataSource } from '@/services/datasource';
+import { DataSoureItem } from '@/services/datasource.d';
 
 const { Item } = Form;
 
 export interface DataSourceFormProps {
-  onCancel: (flag?: boolean, formVals?: API.DataSoureItem) => void;
-  onSubmit: (values: API.DataSoureItem) => Promise<void>;
+  onCancel: (flag?: boolean, formVals?: DataSoureItem) => void;
+  onSubmit: (values: DataSoureItem) => Promise<void>;
   formVisible: boolean;
   editFlag: boolean;
-  values?: Partial<API.DataSoureItem>;
+  values?: Partial<DataSoureItem>;
 }
 
-const dataSourceCheck = async (fields: API.DataSoureItem) => {
+const dataSourceCheck = async (fields: DataSoureItem) => {
   const hide = message.loading('正在检测中...');
   try {
     const ret = await testDataSource({ ...fields });

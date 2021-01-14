@@ -1,5 +1,7 @@
-import { request } from 'umi';
-import { ServeItem, ServeListParams, ServeGroupTreeParams } from './data';
+import { ApiBody } from './Global';
+import request from '@/utils/request';
+
+import { ServeItem, ServeListParams, ServeGroupTreeParams } from './serve.d';
 
 export async function queryServe(params?: ServeListParams) {
   return request('/api/serves', {

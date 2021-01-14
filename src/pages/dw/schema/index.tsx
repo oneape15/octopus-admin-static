@@ -1,22 +1,24 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Layout, Select, List, Divider, Button, message, Modal } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Layout, Select, List, Divider, message, } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
-import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
-import { DatabaseOutlined, TableOutlined } from '@ant-design/icons';
+import { DatabaseOutlined } from '@ant-design/icons';
 import {
   getAllDataSource,
 } from '@/services/datasource';
 import {
   fetchTableList
 } from '@/services/schema';
+import { TableSchemaItem } from '@/services/schema.d';
 import { ItemProps } from '@/services/Global';
 import style from './index.less';
-import OptionDropdown, { BTNS_KEY } from '@/components/OptionDropdown';
+import SchemaListItem from './components/SchemaListItem';
+import ColumnList from './components/ColumnList';
 
 const { Sider, Content } = Layout;
 const SchemaManagePage: React.FC<{}> = () => {
   const [dataSourceList, setDataSourceList] = useState<ItemProps[]>();
-  const [schemaList, setSchemaList] = useState<API.TableSchemaItem[]>();
+  const [schemaList, setSchemaList] = useState<TableSchemaItem[]>();
+  const [schemaValue, setSchemaValue] = useState<TableSchemaItem>();
   useEffect(() => {
     if (dataSourceList == undefined) {
       getAllDataSource()
@@ -54,6 +56,7 @@ const SchemaManagePage: React.FC<{}> = () => {
                   const { code, data, msg } = apiBody;
                   if (code === 200 && data) {
                     setSchemaList(data);
+                    setSchemaValue(data && data.length > 0 ? data[0] : undefined);
                   } else {
                     message.error(msg);
                   }
@@ -65,7 +68,7 @@ const SchemaManagePage: React.FC<{}> = () => {
               placeholder="选择一个数据源"
               options={dataSourceList}
             />
-            <Divider orientation="left">表集合</Divider>
+            <Divider orientation="left">{`表集合(${schemaList !== undefined ? schemaList.length : 0}张)`}</Divider>
             <div className={style.schemaInfiniteContainer}>
               <List
                 dataSource={schemaList}
@@ -74,23 +77,27 @@ const SchemaManagePage: React.FC<{}> = () => {
                 size="small"
                 bordered
                 renderItem={item => (
-                  <List.Item>
-                    {/* <List.Item.Meta
-                      avatar={<TableOutlined />}
-                      title={item.name}
-                      description={item.alias}
-                    /> */}
-                    {<div>
-                      {item.name}
-                      </div>}
+                  <List.Item className={schemaValue !== undefined && schemaValue.name === item.name && style.schemaItemSelected}>
+                    <SchemaListItem
+                      name={item.name}
+                      heat={item.heat}
+                      comment={item.alias}
+                      onClick={(value) => {
+                        setSchemaValue(schemaList?.filter(s => {
+                          return s.name === value
+                        })[0])
+                      }}
+                    />
                   </List.Item>
                 )}
               />
             </div>
           </div>
         </Sider>
-        <Content>
-
+        <Content className={style.content}>
+          <ColumnList
+            schemaInfo={schemaValue}
+          />
         </Content>
       </Layout>
     </PageContainer>

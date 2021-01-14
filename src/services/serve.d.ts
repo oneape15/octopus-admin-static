@@ -1,4 +1,6 @@
-export interface ServeItem {
+import { BaseItem, BaseQueryParams } from './Global';
+
+export interface ServeItem extends BaseItem {
   id: number;
   name: string;
   code: string;
@@ -9,12 +11,8 @@ export interface ServeItem {
   status: string;
 }
 
-export interface ServeListParams {
+export interface ServeListParams extends BaseQueryParams {
   name?: string;
-  pageSize?: number;
-  currentPage?: number;
-  filter?: { [key: string]: any[] };
-  sorter?: { [key: string]: any };
 }
 
 export interface ServeGroupTreeParams {

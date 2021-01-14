@@ -8,6 +8,7 @@ import Footer from '@/components/Footer';
 import LoginFrom from './components';
 import { Md5 } from 'md5-typescript';
 import styles from './style.less';
+import { ApiBody } from '@/services/Global.d';
 
 const { Tab, Username, Password, Mobile, Captcha, Submit } = LoginFrom;
 
@@ -34,7 +35,7 @@ const goto = () => {
 };
 
 const Login: React.FC<{}> = () => {
-  const [userLoginState, setUserLoginState] = useState<API.MsgBody>();
+  const [userLoginState, setUserLoginState] = useState<ApiBody<string>>();
   const [submitting, setSubmitting] = useState(false);
   const [autoLogin, setAutoLogin] = useState(true);
   const [type, setType] = useState<string>('account');

@@ -2,8 +2,8 @@ import React, { useState, useRef } from 'react';
 import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
 import { Layout, Tree, Input, Button, Menu, Dropdown, Divider, message, Drawer } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { ServeItem } from '../../data';
-import { queryServe, genGroupTree } from '../../service'
+import { ServeItem } from '@/services/serve.d';
+import { queryServe, genGroupTree } from '@/services/serve'
 import style from '../index.less';
 
 const { Sider, Content } = Layout;

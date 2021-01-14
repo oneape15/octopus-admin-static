@@ -11,6 +11,7 @@ import {
   syncSchema,
   delDataSoure,
 } from '@/services/datasource';
+import {DataSoureItem} from '@/services/datasource.d';
 import DataSoureForm from './components/DataSourceForm';
 import OptionDropdown, { BTNS_KEY } from '@/components/OptionDropdown';
 
@@ -18,7 +19,7 @@ import OptionDropdown, { BTNS_KEY } from '@/components/OptionDropdown';
  * 保存数据源
  * @param fields
  */
-const handleSave = async (fields: API.DataSoureItem) => {
+const handleSave = async (fields: DataSoureItem) => {
   const tag = fields.id > 0 ? '修改' : '添加';
   const hide = message.loading(`正在${tag}...`);
   try {
@@ -90,10 +91,10 @@ const handleSync = async (id: number) => {
  * 删除数据源操作
  * @param id 
  */
-const handleDel = async (params: { id: number }) => {
+const handleDel = async (id: number) => {
   const hide = message.loading(`正在删除数据源...`);
   try {
-    const ret = await delDataSoure(params);
+    const ret = await delDataSoure(id);
     hide();
     if (ret.code === 200) {
       message.success(`删除成功`);
@@ -113,10 +114,10 @@ const DataSourceManagePage: React.FC<{}> = () => {
   const [formVisible, handleFormVisible] = useState<boolean>(false);
   const [delModalVisible, handleDelModalVisible] = useState<boolean>(false);
   const [editFlag, setEditFlag] = useState<boolean>(false);
-  const [optValue, setOptValue] = useState<API.DataSoureItem>();
+  const [optValue, setOptValue] = useState<DataSoureItem>();
   const actionRef = useRef<ActionType>();
 
-  const columns: ProColumns<API.DataSoureItem>[] = [
+  const columns: ProColumns<DataSoureItem>[] = [
     { title: '数据源名称', dataIndex: 'name' },
     {
       title: '类型', dataIndex: 'type', valueEnum: {
@@ -196,7 +197,7 @@ const DataSourceManagePage: React.FC<{}> = () => {
   return (
     <PageContainer>
       <div style={{ display: formVisible ? 'none' : 'block' }}>
-        <ProTable<API.DataSoureItem>
+        <ProTable<DataSoureItem>
           actionRef={actionRef}
           rowKey="id"
           columns={columns}
@@ -254,7 +255,7 @@ const DataSourceManagePage: React.FC<{}> = () => {
         }}
         onOk={() => {
           const id = optValue?.id ? optValue?.id : -1;
-          const status = handleDel({ id });
+          const status = handleDel(id);
           if (status) {
             setOptValue(undefined);
             handleDelModalVisible(false);

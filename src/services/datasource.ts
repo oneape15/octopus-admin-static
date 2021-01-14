@@ -1,27 +1,44 @@
 import request from '@/utils/request';
-import { ApiBody, PageInfo } from './Global';
+import { ApiBody, PageInfo } from './Global.d';
+import { DataSourceType, DataSoureItem, DataSourceParams } from './datasource.d';
 
-export async function queryDataSource(params: API.DataSourceParams) {
-  return request<ApiBody<PageInfo<API.DataSoureItem[]>>>('/api/ds/list', {
+/**
+ * Paging the list.
+ * @param params 
+ */
+export async function queryDataSource(params: DataSourceParams) {
+  return request<ApiBody<PageInfo<DataSoureItem[]>>>('/api/ds/list', {
     data: { ...params },
     method: 'POST',
   })
 }
 
-export async function saveDataSource(params: API.DataSoureItem) {
+/**
+ * Data source save.
+ * @param params 
+ */
+export async function saveDataSource(params: DataSoureItem) {
   return request<ApiBody<string>>('/api/ds/save', {
     data: { ...params },
     method: 'POST',
   })
 }
 
-export async function testDataSource(params: API.DataSoureItem) {
+/**
+ * Test whether the data source is available.
+ * @param params 
+ */
+export async function testDataSource(params: DataSoureItem) {
   return request<ApiBody<string>>('/api/ds/test', {
     data: { ...params },
     method: 'POST',
   })
 }
 
+/**
+ * Data source status change.
+ * @param params 
+ */
 export async function changeDataSourceStatus(params: { id: number, status: number }) {
   return request<ApiBody<string>>(
     '/api/ds/changeStatus',
@@ -34,6 +51,10 @@ export async function changeDataSourceStatus(params: { id: number, status: numbe
   );
 }
 
+/**
+ * Sync dataSource schema.
+ * @param params 
+ */
 export async function syncSchema(params: { id: number }) {
   return request<ApiBody<string>>(
     '/api/ds/syncSchema',
@@ -45,24 +66,25 @@ export async function syncSchema(params: { id: number }) {
     }
   );
 }
-
-export async function delDataSoure(params: { id: number }) {
+/**
+ * Data source deleted.
+ * @param params 
+ */
+export async function delDataSoure(id: number) {
   return request<ApiBody<string>>(
-    '/api/ds/del',
+    `/api/ds/del/${id}`,
     {
-      data: {
-        ...params
-      },
+      data: {},
       method: 'POST'
     }
   );
 }
 
 /**
- * 获取支持的数据源类型
+ * Gets the supported data source type.
  */
 export async function getAllDsTypes() {
-  return request<ApiBody<API.DataSourceType[]>>(
+  return request<ApiBody<DataSourceType[]>>(
     '/api/ds/getAllDsTypes',
     {
       method: 'GET',
@@ -70,8 +92,11 @@ export async function getAllDsTypes() {
   );
 }
 
+/**
+ * Take all available data sources.
+ */
 export async function getAllDataSource() {
-  return request<ApiBody<API.DataSoureItem[]>>(
+  return request<ApiBody<DataSoureItem[]>>(
     '/api/ds/getAllSimple',
     {
       method: 'GET'
