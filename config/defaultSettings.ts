@@ -1,5 +1,5 @@
 import { Settings as LayoutSettings } from '@ant-design/pro-layout';
-
+import logo from '@/assets/logo.svg';
 export default {
   navTheme: 'light',
   // 拂晓蓝
@@ -14,7 +14,7 @@ export default {
   },
   title: 'Octopus Admin',
   pwa: false,
-  logo: 'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg',
+  logo: logo,
   iconfontUrl: '',
 } as LayoutSettings & {
   pwa: boolean;
