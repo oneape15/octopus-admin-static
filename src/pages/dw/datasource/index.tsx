@@ -11,7 +11,7 @@ import {
   syncSchema,
   delDataSoure,
 } from '@/services/datasource';
-import {DataSoureItem} from '@/services/datasource.d';
+import { DataSoureItem } from '@/services/datasource.d';
 import DataSoureForm from './components/DataSourceForm';
 import OptionDropdown, { BTNS_KEY } from '@/components/OptionDropdown';
 
@@ -126,8 +126,8 @@ const DataSourceManagePage: React.FC<{}> = () => {
         ODPS: { text: 'ODPS' },
       }
     },
-    { title: 'URL', dataIndex: 'jdbcUrl' },
-    { title: '登录名', dataIndex: 'username' },
+    { title: 'URL', dataIndex: 'jdbcUrl', ellipsis: true, copyable: true },
+    { title: '登录名', dataIndex: 'username', ellipsis: true },
     {
       title: '读写权限', dataIndex: 'readOnly', valueEnum: {
         0: { text: '只读', status: 'Default' },
@@ -203,6 +203,9 @@ const DataSourceManagePage: React.FC<{}> = () => {
           columns={columns}
           search={{
             labelWidth: 120,
+          }}
+          pagination={{
+            pageSize: 10,
           }}
           toolBarRender={() => [
             <Button key="add" type="primary" onClick={() => handleFormVisible(true)}>

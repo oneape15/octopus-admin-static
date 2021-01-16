@@ -41,7 +41,7 @@ export async function fetchTableList(dsId: number | string) {
  * @param dsId 
  * @param tableName 
  */
-export async function fetchColumnList(dsId: number | string | string, tableName: string) {
+export async function fetchColumnList(dsId: number | string, tableName: string) {
   return request<ApiBody<TableColumnItem[]>>(
     `/api/schema/fetchTableColumnList/${dsId}/${tableName}`, {
     data: {},
@@ -82,7 +82,7 @@ export async function changeTableInfo(params: {
   comment?: string
 }) {
   return request<ApiBody<string>>(
-    '/api/schema/column/changeInfo', {
+    '/api/schema/table/changeInfo', {
     data: {
       ...params
     },

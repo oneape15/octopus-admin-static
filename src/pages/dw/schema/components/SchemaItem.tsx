@@ -1,5 +1,4 @@
 import React from 'react';
-import { Badge } from 'antd';
 import { TableOutlined } from '@ant-design/icons';
 
 import style from '../index.less';
@@ -10,7 +9,7 @@ export interface SchemaListItemProps {
   onClick: (value: string) => void;
 }
 
-const SchemaListItem: React.FC<SchemaListItemProps> = (props) => {
+const SchemaItem: React.FC<SchemaListItemProps> = (props) => {
   const { name, comment, heat, onClick } = props;
   return (
     <div
@@ -23,4 +22,4 @@ const SchemaListItem: React.FC<SchemaListItemProps> = (props) => {
   );
 }
 
-export default SchemaListItem;
+export default SchemaItem;
