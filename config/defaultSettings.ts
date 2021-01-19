@@ -14,7 +14,7 @@ export default {
   },
   title: 'Octopus Admin',
   pwa: false,
-  logo: logo,
+  // logo: logo,
   iconfontUrl: '',
 } as LayoutSettings & {
   pwa: boolean;

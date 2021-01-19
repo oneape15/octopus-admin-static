@@ -13,6 +13,8 @@ import {
 } from '@/services/schema';
 import { TableColumnItem, TableSchemaItem } from '@/services/schema.d';
 import { ItemProps } from '@/services/Global';
+import { requestIsOk, codeIsOk } from '@/utils/utils';
+
 import style from './index.less';
 import SchemaDetail from './components/SchemaDetail';
 import SchemaItem from './components/SchemaItem';
@@ -63,9 +65,8 @@ const SchemaManagePage: React.FC<{}> = () => {
 
   const getColumnList = async (dsId: number, tableName: string) => {
     try {
-      const apiBody = await fetchColumnList(dsId, tableName);
-      const { code, data, msg } = apiBody;
-      if (code === 200 && data) {
+      const { code, data, msg } = await fetchColumnList(dsId, tableName);
+      if (codeIsOk(code) && data) {
         message.success('获取字段信息成功');
         setColumnList(data);
       } else {
@@ -83,7 +84,7 @@ const SchemaManagePage: React.FC<{}> = () => {
       getAllDataSource()
         .then((apiBody) => {
           const { code, data, msg } = apiBody;
-          if (code === 200 && data) {
+          if (codeIsOk(code) && data) {
             const options: ItemProps[] = [];
             data.forEach(ds => {
               options.push({
@@ -121,8 +122,8 @@ const SchemaManagePage: React.FC<{}> = () => {
               showSearch
               onChange={(value: string) => {
                 fetchTableList(value).then((apiBody) => {
-                  const { code, data, msg } = apiBody;
-                  if (code === 200 && data) {
+                  const { data, msg } = apiBody;
+                  if (requestIsOk(apiBody) && data) {
                     setSchemaList(data);
                     setSchemaValue(data && data.length > 0 ? data[0] : undefined);
                   } else {

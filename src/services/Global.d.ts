@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 export interface ApiBody<T> {
   code: number;
   msg?: string;
@@ -33,4 +35,18 @@ export interface BaseQueryParams {
   current?: number;
   filter?: { [key: string]: any[] };
   sorter?: { [key: string]: any };
+}
+
+/**
+ * Tree item
+ */
+export interface TreeItem {
+  title: string;
+  key: string;
+  icon?: ReactNode | string;
+  children?: TreeItem[]
+  disabled?: boolean;
+  selectable?: boolean;
+  isLeaf?: boolean;
+  props?: { [key: string]: any | any[] }
 }

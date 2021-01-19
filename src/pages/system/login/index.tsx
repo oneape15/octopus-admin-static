@@ -9,6 +9,7 @@ import LoginFrom from './components';
 import { Md5 } from 'md5-typescript';
 import styles from './style.less';
 import { ApiBody } from '@/services/Global.d';
+import { requestIsOk, codeIsOk } from '@/utils/utils';
 
 const { Tab, Username, Password, Mobile, Captcha, Submit } = LoginFrom;
 
@@ -44,20 +45,20 @@ const Login: React.FC<{}> = () => {
     try {
       values.password = Md5.init(Md5.init(values.password).toLocaleLowerCase() + values.username)
       // 登录
-      const retObj = await fakeAccountLogin({ ...values, type });
-      const { code, data } = retObj;
+      const ret = await fakeAccountLogin({ ...values, type });
+      const { code, data } = ret;
       let token;
       if (data) {
         token = data;
       }
-      if (code === 200 && token) {
+      if (codeIsOk(code) && token) {
         message.success('登录成功！');
         localStorage.setItem('token', token);
         goto();
         return;
       }
       // 如果失败去设置用户错误信息
-      setUserLoginState(retObj);
+      setUserLoginState(ret);
     } catch (error) {
       message.error('登录失败，请重试！');
     }
@@ -84,7 +85,7 @@ const Login: React.FC<{}> = () => {
         <div className={styles.main}>
           <LoginFrom activeKey={type} onTabChange={setType} onSubmit={handleSubmit}>
             <Tab key="account" tab="账户密码登录">
-              {code && code !== 200 && !submitting && (
+              {code && !codeIsOk(code) && !submitting && (
                 <LoginMessage content={msg ? msg : "账户或密码错误"} />
               )}
 
@@ -110,7 +111,7 @@ const Login: React.FC<{}> = () => {
               />
             </Tab>
             <Tab key="mobile" tab="手机号登录">
-              {code && code !== 200 && !submitting && (
+              {code && !codeIsOk(code) && !submitting && (
                 <LoginMessage content={msg ? msg : "验证码错误"} />
               )}
               <Mobile

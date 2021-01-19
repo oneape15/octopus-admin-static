@@ -13,6 +13,7 @@ import {
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { testDataSource } from '@/services/datasource';
 import { DataSoureItem } from '@/services/datasource.d';
+import { requestIsOk } from '@/utils/utils';
 
 const { Item } = Form;
 
@@ -29,7 +30,7 @@ const dataSourceCheck = async (fields: DataSoureItem) => {
   try {
     const ret = await testDataSource({ ...fields });
     hide();
-    if (ret.code === 200) {
+    if (requestIsOk(ret)) {
       message.success('数据源配置可用。');
       return true;
     } else {

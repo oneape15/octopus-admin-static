@@ -7,6 +7,7 @@ const layout = {
   labelCol: { span: 5 },
   wrapperCol: { span: 18 },
 };
+
 export interface UpdateSchemaFormProps {
   onCancel: (flag?: boolean, formVals?: TableSchemaItem) => void;
   onSubmit: (values: TableSchemaItem) => Promise<void>;

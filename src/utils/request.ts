@@ -52,7 +52,7 @@ const errorHandler = (error: { response: Response }): Response => {
 const request = extend({
   errorHandler, // 默认错误处理
   credentials: 'include', // 默认请求是否带上cookie
-  timeout: 10000,
+  timeout: 60000,
   // 当JSON.parse(res)出错时，抛出错误
   throwErrIfParseFail: true,
   // post 请求时数据类型

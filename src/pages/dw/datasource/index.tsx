@@ -3,6 +3,7 @@ import React, { useState, useRef } from 'react';
 import { Button, message, Modal } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
+import { requestIsOk, buildRequestData } from '@/utils/utils';
 
 import {
   queryDataSource,
@@ -25,7 +26,7 @@ const handleSave = async (fields: DataSoureItem) => {
   try {
     const ret = await saveDataSource({ ...fields });
     hide();
-    if (ret.code === 200) {
+    if (requestIsOk(ret)) {
       message.success(`${tag}成功`);
       return true;
     } else {
@@ -50,7 +51,7 @@ const handleStatus = async (id: number, status: number) => {
   try {
     const ret = await changeDataSourceStatus({ id, status: status === 0 ? 1 : 0 });
     hide();
-    if (ret.code === 200) {
+    if (requestIsOk(ret)) {
       message.success(`${tag}成功`);
       return true;
     } else {
@@ -73,7 +74,7 @@ const handleSync = async (id: number) => {
   try {
     const ret = await syncSchema({ id });
     hide();
-    if (ret.code === 200) {
+    if (requestIsOk(ret)) {
       message.success(`同步成功`);
       return true;
     } else {
@@ -96,7 +97,7 @@ const handleDel = async (id: number) => {
   try {
     const ret = await delDataSoure(id);
     hide();
-    if (ret.code === 200) {
+    if (requestIsOk(ret)) {
       message.success(`删除成功`);
       return true;
     } else {
@@ -213,12 +214,8 @@ const DataSourceManagePage: React.FC<{}> = () => {
           </Button>
           ]}
           request={async (params, sorter, filter) => {
-            const { code, data: { list, total }, msg } = await queryDataSource({ ...params, sorter, filter });
-            let pageInfo = {
-              data: list,
-              total: total
-            };
-            return pageInfo;
+            const apiBody = await queryDataSource({ ...params, sorter, filter });
+            return buildRequestData(apiBody);
           }}
         />
       </div>
