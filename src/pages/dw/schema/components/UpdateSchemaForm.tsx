@@ -45,21 +45,20 @@ const UpdateSchemaForm: React.FC<UpdateSchemaFormProps> = (props) => {
         <Form.Item
           name="name"
           label="表名"
-          rules={[{ required: true, message: '请输入规则名称！' }]}
         >
           <Input name="name" disabled />
         </Form.Item>
         <Form.Item
           name="alias"
           label="别名"
-          rules={[{ required: true, message: '请输入规则名称！' }]}
+          rules={[{ required: true, message: '请输入别名！' }]}
         >
           <Input name="alias" />
         </Form.Item>
         <Form.Item
           label="同步任务"
           name="sync"
-          rules={[{ required: true, message: '请输入规则名称！' }]}
+          rules={[{ required: true, message: '请输入！' }]}
         >
           <Radio.Group buttonStyle="solid">
             <Radio.Button value={0}>关闭</Radio.Button>

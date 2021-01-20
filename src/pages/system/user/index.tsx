@@ -1,23 +1,35 @@
 import { PlusOutlined } from '@ant-design/icons';
 import React, { useState, useRef } from 'react';
-import { Button, Menu, Dropdown, Divider, message, Input, Drawer } from 'antd';
-import { FooterToolbar, PageContainer } from '@ant-design/pro-layout';
+import { Button, Modal, message, } from 'antd';
+import { PageContainer } from '@ant-design/pro-layout';
 import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
-import CreateUserForm from './components/CreateUserForm';
+import { requestIsOk, buildRequestData } from '@/utils/utils';
 
-import { UserItem } from '../data';
-import { queryUser, addUser, updateUser, removeUser } from '../service';
-import styles from './style.less';
-import OptionDropdown from '@/components/OptionDropdown';
+import { UserItem } from '@/services/user.d';
+import { queryUser, saveUser, delUser, lockUser, unlockUser } from '@/services/user';
+import OptionDropdown, { BTNS_KEY } from '@/components/OptionDropdown';
+import UpdateUserForm from './components/UpdateUserForm';
+import {
+  LockOutlined,
+  UnlockOutlined,
+} from '@ant-design/icons';
 
 /**
  * add user
  * @param fields 
  */
-const handleAdd = async (fields: UserItem) => {
-  const hide = message.loading('正在添加用户');
+const handleSave = async (fields: UserItem) => {
+  const tag = fields.id > 0 ? '修改' : '添加';
+  const hide = message.loading(`正在${tag}用户...`);
   try {
-    await addUser({ ...fields });
+    const ret = await saveUser({ ...fields });
+    if (requestIsOk(ret)) {
+      message.success(`${tag}成功`);
+      return true;
+    } else {
+      message.error(ret.msg);
+      return false;
+    }
   } catch (error) {
     hide();
     message.error('添加用户失败，请重试!');
@@ -26,39 +38,21 @@ const handleAdd = async (fields: UserItem) => {
 }
 
 /**
- * update user information.
- * @param fields 
- */
-const handleUpdate = async (fields: UserItem) => {
-  const hide = message.loading('正在更新用户信息');
-  try {
-    await updateUser({
-      ...fields
-    });
-    hide();
-    message.success('更新用户信息成功！');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('更新用户信息失败！');
-    return false;
-  }
-}
-
-/**
  * remove user
- * @param selectRows 
+ * @param userId 
  */
-const handleRemove = async (selectRows: UserItem[]) => {
+const handleDel = async (userId: number) => {
   const hide = message.loading('正在删除...');
-  if (!selectRows) return true;
   try {
-    await removeUser({
-      ids: selectRows.map((row) => row.id),
-    });
+    const ret = await delUser(userId);
     hide();
-    message.success('删除成功，即将刷新！');
-    return true;
+    if (requestIsOk(ret)) {
+      message.success(`删除成功`);
+      return true;
+    } else {
+      message.error(ret.msg);
+      return false;
+    }
   } catch (error) {
     hide();
     message.error('删除用户失败, 请重试');
@@ -66,17 +60,88 @@ const handleRemove = async (selectRows: UserItem[]) => {
   }
 }
 
-const RoleManagePage: React.FC<{}> = () => {
-  const [createModalVisible, handleModalVisible] = useState<boolean>(false);
-  const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
+/**
+ * lock user
+ * @param userId 
+ */
+const handleLock = async (userId: number) => {
+  const hide = message.loading('正在锁定...');
+  try {
+    const ret = await lockUser(userId);
+    hide();
+    if (requestIsOk(ret)) {
+      message.success(`锁定成功`);
+      return true;
+    } else {
+      message.error(ret.msg);
+      return false;
+    }
+  } catch (error) {
+    hide();
+    message.error('锁定用户失败, 请重试');
+    return false;
+  }
+}
+
+/**
+ * unlock user
+ * @param userId 
+ */
+const handleUnlock = async (userId: number) => {
+  const hide = message.loading('正在解锁...');
+  try {
+    const ret = await unlockUser(userId);
+    hide();
+    if (requestIsOk(ret)) {
+      message.success(`解锁成功`);
+      return true;
+    } else {
+      message.error(ret.msg);
+      return false;
+    }
+  } catch (error) {
+    hide();
+    message.error('解锁用户失败, 请重试');
+    return false;
+  }
+}
+
+/**
+ * check is lock status
+ * @param value 
+ */
+const isLockStatus = (value: UserItem | undefined): boolean => {
+  if (value) {
+    return value.status === 'LOCK';
+  }
+  return false;
+}
+
+/**
+ * check is normal status
+ * @param value 
+ */
+const isNormalStatus = (value: UserItem | undefined): boolean => {
+  if (value) {
+    return value.status === 'NORMAL';
+  }
+  return false;
+}
+
+const UserManagePage: React.FC<{}> = () => {
+  const [formVisible, handleFormVisible] = useState<boolean>(false);
+  const [delModalVisible, handleDelModalVisible] = useState<boolean>(false);
+  const [lockOptVisible, handleLockOptVisible] = useState<boolean>(false);
+  const [isLock, setIsLock] = useState<boolean>(false);
+  const [editFlag, setEditFlag] = useState<boolean>(false);
+  const [optValue, setOptValue] = useState<UserItem>();
+
   const actionRef = useRef<ActionType>();
-  const [row, setRow] = useState<UserItem>();
-  const [selectedRowsState, setSelectedRows] = useState<UserItem[]>([]);
   const columns: ProColumns<UserItem>[] = [
     {
       title: '头像',
       dataIndex: 'avator',
-      hideInForm: true,
+      hideInSearch: true,
       render: (value, record) => {
         return <img alt=""
           src={record.avatar}
@@ -84,28 +149,16 @@ const RoleManagePage: React.FC<{}> = () => {
         />
       }
     },
-    {
-      title: '用户名',
-      dataIndex: 'name',
-      tip: '用户名称',
-      formItemProps: {
-        rules: [
-          {
-            required: true,
-            message: '用户名必填',
-          }
-        ]
-      }
-    },
+    { title: '用户名', dataIndex: 'username', tip: '用户名称', },
     {
       title: '状态', dataIndex: 'status', valueEnum: {
-        0: { text: '未激活', status: 'Default' },
-        1: { text: '正常', status: 'Success' },
-        2: { text: '锁定', status: 'Error' },
+        INACTIVE: { text: '未激活', status: 'Default' },
+        NORMAL: { text: '正常', status: 'Success' },
+        LOCK: { text: '锁定', status: 'Error' },
       },
     },
     { title: '昵称', dataIndex: 'nickname', tip: '用户昵称', },
-    { title: '手机号', dataIndex: 'phone' },
+    { title: '手机号', dataIndex: 'phone', },
     { title: '邮箱', dataIndex: 'email', },
     {
       title: '操作',
@@ -114,10 +167,35 @@ const RoleManagePage: React.FC<{}> = () => {
       valueType: 'option',
       render: (_, record) => (
         <OptionDropdown
-          menus
+          menuKeys={[
+            { key: BTNS_KEY.EDIT, disabled: true, },
+            { key: BTNS_KEY.DEL, disabled: true, },
+            { key: 'lock', title: '锁定', disabled: isNormalStatus(record), icon: <LockOutlined /> },
+            { key: 'unlock', title: '解锁', disabled: isLockStatus(record), icon: <UnlockOutlined /> },
+          ]}
           dataKey={record.id}
           onItemClick={(key, id) => {
-            console.log(key, id);
+            switch (key) {
+              case BTNS_KEY.EDIT:
+                handleFormVisible(true);
+                setEditFlag(true);
+                setOptValue(record);
+                break;
+              case BTNS_KEY.DEL:
+                handleDelModalVisible(true);
+                setOptValue(record);
+                break;
+              case 'lock':
+                handleLockOptVisible(true);
+                setOptValue(record);
+                setIsLock(false);
+                break;
+              case 'unlock':
+                handleLockOptVisible(true);
+                setOptValue(record);
+                setIsLock(true);
+                break;
+            }
           }} />
       ),
     },
@@ -129,37 +207,102 @@ const RoleManagePage: React.FC<{}> = () => {
         size="small"
         actionRef={actionRef}
         rowKey="id"
+        columns={columns}
         search={{
           labelWidth: 120,
         }}
+        pagination={{
+          pageSize: 10,
+        }}
         toolBarRender={() => [
-          <Button key="add" type="primary" onClick={() => handleModalVisible(true)}>
+          <Button key="add" type="primary" onClick={() => handleFormVisible(true)}>
             <PlusOutlined />添加
           </Button>
         ]}
-        request={(params, sorter, filter) => queryUser({ ...params, sorter, filter })}
-        columns={columns}
-        rowSelection={{
-          onChange: (_, selectedRows) => setSelectedRows(selectedRows),
+        request={async (params, sorter, filter) => {
+          const apiBody = await queryUser({ ...params, sorter, filter });
+          return buildRequestData(apiBody);
         }}
       />
-      {selectedRowsState?.length > 0 && (
-        <FooterToolbar
-          extra={
-            <div>
-              已选择<a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a>&nbsp;项&nbsp;
-          </div>
-          }
-        >
-          <Button>批量锁定</Button>
-          <Button>批量删除</Button>
-        </FooterToolbar>
+      {formVisible && (
+        <UpdateUserForm
+          formVisible={formVisible}
+          editFlag={editFlag}
+          values={optValue ? optValue : {}}
+          onCancel={() => {
+            handleFormVisible(false);
+            setOptValue(undefined);
+            setEditFlag(false);
+          }}
+          onSubmit={async (value) => {
+            const success = await handleSave(value);
+            if (success) {
+              handleFormVisible(false);
+              setEditFlag(false);
+              setOptValue(undefined);
+              if (actionRef.current) {
+                actionRef.current.reload();
+              }
+            }
+          }}
+        />
       )}
-      <CreateUserForm onCancel={() => handleModalVisible(false)} modalVisible={createModalVisible} >
+      {delModalVisible && (
+        <Modal
+          title="删除操作"
+          visible={delModalVisible}
+          okText="确认"
+          cancelText="取消"
+          width="320px"
+          onCancel={() => {
+            setOptValue(undefined);
+            handleDelModalVisible(false);
+          }}
+          onOk={() => {
+            const id = optValue?.id ? optValue?.id : -1;
+            const status = handleDel(id);
+            if (status) {
+              setOptValue(undefined);
+              handleDelModalVisible(false);
+              if (actionRef.current) {
+                actionRef.current.reload();
+              }
+            };
+          }}
+        >
+          <p>确认删除用户： {optValue?.username}</p>
+        </Modal>
+      )}
 
-      </CreateUserForm>
+      <Modal
+        title={isLock ? '解锁操作' : '锁定操作'}
+        visible={lockOptVisible}
+        okText="确认"
+        cancelText="取消"
+        width="320px"
+        onCancel={() => {
+          handleLockOptVisible(false);
+          setIsLock(false);
+          setOptValue(undefined);
+        }}
+        onOk={async () => {
+          const id = optValue?.id ? optValue?.id : -1;
+          const status = await (isLock ? handleUnlock(id) : handleLock(id));
+          if (status) {
+            handleLockOptVisible(false);
+            setIsLock(false);
+            setOptValue(undefined);
+            if (actionRef.current) {
+              actionRef.current.reload();
+            }
+          };
+        }}
+      >
+        <p>确定{isLock ? '解锁' : '锁定'}用户：{optValue?.username}</p>
+      </Modal>
+
     </PageContainer>
   );
 }
 
-export default RoleManagePage;
+export default UserManagePage;

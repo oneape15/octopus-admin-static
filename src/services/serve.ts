@@ -3,6 +3,7 @@ import { ApiBody, PageInfo, TreeItem } from './Global.d';
 import { ServeItem, ServeGroupItem, ServeListParams, ServeGroupTreeParams } from './serve.d';
 
 const URI_PREFIX = '/api/serve';
+
 /**
  * Save serve information.
  * @param params 

@@ -2,12 +2,15 @@ import request from '@/utils/request';
 import { ApiBody, PageInfo } from './Global.d';
 import { DataSourceType, DataSoureItem, DataSourceParams } from './datasource.d';
 
+const URI_PREFIX = '/api/ds';
+
 /**
  * Paging the list.
  * @param params 
  */
 export async function queryDataSource(params: DataSourceParams) {
-  return request<ApiBody<PageInfo<DataSoureItem[]>>>('/api/ds/list', {
+  return request<ApiBody<PageInfo<DataSoureItem[]>>>(
+    `${URI_PREFIX}/list`, {
     data: { ...params },
     method: 'POST',
   })
@@ -18,7 +21,8 @@ export async function queryDataSource(params: DataSourceParams) {
  * @param params 
  */
 export async function saveDataSource(params: DataSoureItem) {
-  return request<ApiBody<string>>('/api/ds/save', {
+  return request<ApiBody<string>>(
+    `${URI_PREFIX}/save`, {
     data: { ...params },
     method: 'POST',
   })
@@ -29,7 +33,8 @@ export async function saveDataSource(params: DataSoureItem) {
  * @param params 
  */
 export async function testDataSource(params: DataSoureItem) {
-  return request<ApiBody<string>>('/api/ds/test', {
+  return request<ApiBody<string>>(
+    `${URI_PREFIX}/test`, {
     data: { ...params },
     method: 'POST',
   })
@@ -41,7 +46,7 @@ export async function testDataSource(params: DataSoureItem) {
  */
 export async function changeDataSourceStatus(params: { id: number, status: number }) {
   return request<ApiBody<string>>(
-    '/api/ds/changeStatus',
+    `${URI_PREFIX}/changeStatus`,
     {
       data: {
         ...params
@@ -57,7 +62,7 @@ export async function changeDataSourceStatus(params: { id: number, status: numbe
  */
 export async function syncSchema(params: { id: number }) {
   return request<ApiBody<string>>(
-    '/api/ds/syncSchema',
+    `${URI_PREFIX}/syncSchema`,
     {
       data: {
         ...params
@@ -72,7 +77,7 @@ export async function syncSchema(params: { id: number }) {
  */
 export async function delDataSoure(id: number) {
   return request<ApiBody<string>>(
-    `/api/ds/del/${id}`,
+    `${URI_PREFIX}/del/${id}`,
     {
       data: {},
       method: 'POST'
@@ -85,7 +90,7 @@ export async function delDataSoure(id: number) {
  */
 export async function getAllDsTypes() {
   return request<ApiBody<DataSourceType[]>>(
-    '/api/ds/getAllDsTypes',
+    `${URI_PREFIX}/getAllDsTypes`,
     {
       method: 'GET',
     }
@@ -97,7 +102,7 @@ export async function getAllDsTypes() {
  */
 export async function getAllDataSource() {
   return request<ApiBody<DataSoureItem[]>>(
-    '/api/ds/getAllSimple',
+    `${URI_PREFIX}/getAllSimple`,
     {
       method: 'GET'
     }

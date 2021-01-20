@@ -1,13 +1,16 @@
-import { ApiBody } from './Global';
+import { ApiBody } from './Global.d';
 import request from '@/utils/request';
 import { TableSchemaItem, TableColumnItem } from './schema.d';
+
+const URI_PREFIX = '/api/schema';
+
 /**
  * Pull data source Schema
  * @param dsId 
  */
 export async function reloadDataSoure(dsId: number | string) {
   return request<ApiBody<string>>(
-    `/api/schema/reloadDatabase/${dsId}`, {
+    `${URI_PREFIX}/reloadDatabase/${dsId}`, {
     data: {},
     method: 'GET',
   });
@@ -19,7 +22,7 @@ export async function reloadDataSoure(dsId: number | string) {
  */
 export async function reloadTableInfo(dsId: number | string, tableName: string) {
   return request<ApiBody<string>>(
-    `/api/schema/reload/${dsId}/${tableName}`, {
+    `${URI_PREFIX}/reload/${dsId}/${tableName}`, {
     data: {},
     method: 'GET',
   });
@@ -30,7 +33,7 @@ export async function reloadTableInfo(dsId: number | string, tableName: string) 
  */
 export async function fetchTableList(dsId: number | string) {
   return request<ApiBody<TableSchemaItem[]>>(
-    `/api/schema/fetchTableList/${dsId}`, {
+    `${URI_PREFIX}/fetchTableList/${dsId}`, {
     data: {},
     method: 'GET',
   });
@@ -43,7 +46,7 @@ export async function fetchTableList(dsId: number | string) {
  */
 export async function fetchColumnList(dsId: number | string, tableName: string) {
   return request<ApiBody<TableColumnItem[]>>(
-    `/api/schema/fetchTableColumnList/${dsId}/${tableName}`, {
+    `${URI_PREFIX}/fetchTableColumnList/${dsId}/${tableName}`, {
     data: {},
     method: 'GET'
   }
@@ -61,7 +64,7 @@ export async function changeColumnInfo(params: {
   comment?: string
 }) {
   return request<ApiBody<string>>(
-    '/api/schema/column/changeInfo', {
+    `${URI_PREFIX}/column/changeInfo`, {
     data: {
       ...params
     },
@@ -82,7 +85,7 @@ export async function changeTableInfo(params: {
   comment?: string
 }) {
   return request<ApiBody<string>>(
-    '/api/schema/table/changeInfo', {
+    `${URI_PREFIX}/table/changeInfo`, {
     data: {
       ...params
     },

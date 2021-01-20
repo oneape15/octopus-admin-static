@@ -55,6 +55,7 @@ const ServeGroupForm: React.FC<ServeGroupFormProps> = (props) => {
       })
     }
   }, [values]);
+  
   const onChange = (value: any) => {
     console.log(value);
   }
