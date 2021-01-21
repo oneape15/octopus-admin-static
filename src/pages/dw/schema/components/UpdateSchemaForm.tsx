@@ -42,6 +42,9 @@ const UpdateSchemaForm: React.FC<UpdateSchemaFormProps> = (props) => {
         <Form.Item name="id" hidden >
           <Input />
         </Form.Item>
+        <Form.Item name="datasourceId" hidden >
+          <Input name="datasourceId" />
+        </Form.Item>
         <Form.Item
           name="name"
           label="表名"

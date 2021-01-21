@@ -32,14 +32,14 @@ export default [
         name: 'org',
       },
       {
-        path: '/system/role',
-        name: 'role',
-        component: './system/role'
-      },
-      {
         path: '/system/resource',
         name: 'resource',
         component: './system/resource'
+      },
+      {
+        path: '/system/role',
+        name: 'role',
+        component: './system/role'
       },
       {
         path: '/system/user',
@@ -57,6 +57,11 @@ export default [
         path: '/dw/datasource',
         name: 'datasource',
         component: './dw/datasource'
+      },
+      {
+        path: '/dw/datastudio',
+        name: 'datastudio',
+        component: './dw/datastudio'
       },
       {
         path: '/dw/schema',

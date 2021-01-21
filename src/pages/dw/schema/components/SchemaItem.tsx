@@ -2,22 +2,22 @@ import React from 'react';
 import { TableOutlined } from '@ant-design/icons';
 
 import style from '../index.less';
+import { TableSchemaItem } from '@/services/schema.d';
+
 export interface SchemaListItemProps {
-  name: string;
-  heat?: number;
-  comment?: string;
-  onClick: (value: string) => void;
+  value: TableSchemaItem;
+  onClick: (value: TableSchemaItem) => void;
 }
 
 const SchemaItem: React.FC<SchemaListItemProps> = (props) => {
-  const { name, comment, heat, onClick } = props;
+  const { value, onClick } = props;
   return (
     <div
       className={style.schemaItem}
-      onClick={() => onClick(name)}
+      onClick={() => onClick(value)}
     >
-      <div>{name}</div>
-      <div>{comment}</div>
+      <div>{value.name}</div>
+      <div className={style.schemaItemAlias}>{value.alias}</div>
     </div>
   );
 }

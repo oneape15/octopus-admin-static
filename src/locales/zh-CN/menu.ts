@@ -9,6 +9,7 @@ export default {
   'menu.system.user': '用户管理',
   'menu.dw': '数据仓库',
   'menu.dw.datasource': '数据源管理',
+  'menu.dw.datastudio': '数据开发',
   'menu.dw.schema': '表结构管理',
   'menu.dw.term': '术语管理',
   'menu.dw.dataindex': '数据指标',

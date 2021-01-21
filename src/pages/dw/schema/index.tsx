@@ -24,14 +24,22 @@ import UpdateColumnForm from './components/UpdateColumnForm';
 
 const { Sider, Content } = Layout;
 
+/**
+ * update schema information.
+ * @param fields 
+ */
 const handleUpdateSchema = async (fields: TableSchemaItem) => {
   const hide = message.loading('正在修改表信息');
   try {
-    await changeTableInfo(fields);
+    const { code, msg } = await changeTableInfo(fields);
     hide();
-
-    message.success('修改表信息成功');
-    return true;
+    if (codeIsOk(code)) {
+      message.success('修改表信息成功');
+      return true;
+    } else {
+      message.error(msg);
+      return false;
+    }
   } catch (error) {
     hide();
     message.error('修改表信息失败请重试！');
@@ -42,11 +50,15 @@ const handleUpdateSchema = async (fields: TableSchemaItem) => {
 const handleUpdateColumn = async (fields: TableColumnItem) => {
   const hide = message.loading('正在修改字段信息');
   try {
-    await changeColumnInfo(fields);
+    const { code, msg } = await changeColumnInfo(fields);
     hide();
-
-    message.success('修改字段信息成功');
-    return true;
+    if (codeIsOk(code)) {
+      message.success('修改字段信息成功');
+      return true;
+    } else {
+      message.error(msg);
+      return false;
+    }
   } catch (error) {
     hide();
     message.error('修改字段信息失败请重试！');
@@ -148,13 +160,9 @@ const SchemaManagePage: React.FC<{}> = () => {
                 renderItem={item => (
                   <List.Item className={schemaValue !== undefined && schemaValue.name === item.name && style.schemaItemSelected}>
                     <SchemaItem
-                      name={item.name}
-                      heat={item.heat}
-                      comment={item.alias}
+                      value={item}
                       onClick={(value) => {
-                        setSchemaValue(schemaList?.filter(s => {
-                          return s.name === value
-                        })[0])
+                        setSchemaValue(value);
                       }}
                     />
                   </List.Item>
