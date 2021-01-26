@@ -71,9 +71,15 @@ const RoleManagePage: React.FC<{}> = () => {
     { title: '角色编码', dataIndex: 'code' },
     {
       title: '角色类型', dataIndex: 'type', valueEnum: {
-        0: { text: '普通', status: 'Success' },
-        1: { text: '默认', status: 'Default' },
-        2: { text: '系统', status: 'Default' },
+        0: { text: '普通', },
+        1: { text: '默认', },
+        2: { text: '系统', },
+      }
+    },
+    {
+      title: '状态', dataIndex: 'status', valueEnum: {
+        0: { text: '正常', status: 'Success' },
+        1: { text: '锁定', status: 'Default' },
       }
     },
     {
@@ -84,8 +90,8 @@ const RoleManagePage: React.FC<{}> = () => {
             { key: BTNS_KEY.EDIT, disabled: true, },
             { key: BTNS_KEY.DEL, disabled: true, },
           ]}
-          dataKey={record.id}
-          onItemClick={(key, id) => {
+          dataKey={record.id + ''}
+          onItemClick={(id, key) => {
             switch (key) {
               case BTNS_KEY.EDIT:
                 handleFormVisible(true);

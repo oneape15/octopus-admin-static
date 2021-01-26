@@ -3,22 +3,24 @@ import { Tree, Input, Empty, Button } from 'antd';
 import { DownOutlined, PlusOutlined } from '@ant-design/icons';
 import { TreeItem } from '@/services/Global.d';
 
-import OptionDropdown, { BTNS_KEY, BtnStatus } from '@/components/OptionDropdown';
+import OptionDropdown, { BtnStatus } from '@/components/OptionDropdown';
 
 import style from './index.less';
 import { DataNode } from 'antd/lib/tree';
 
-const { TreeNode } = Tree;
-
 export interface SourceTreeProps {
+  needSearch?: boolean;
   treeData: TreeItem[];
-  onAddClick: (pId: number) => void;
+  onAddClick?: (pId: number) => void;
+  onSelect?: (key: string) => void;
+  onBtnClick: (btnKey: string, node: TreeItem) => void;
+  genMoreBtns: (nodeKey: string, node: TreeItem) => BtnStatus[];
 }
 
 const SourceTree: React.FC<SourceTreeProps> = (props) => {
   const [expandedKeys, setExpandedKeys] = useState<string[] | number[]>([]);
   const [autoExpandParent, setAutoExpandParent] = useState<boolean>(false);
-  const { treeData } = props;
+  const { treeData, needSearch, onAddClick, onSelect, onBtnClick, genMoreBtns } = props;
 
   const onExpand = (expandedKeys: string[] | number[]) => {
     setExpandedKeys(expandedKeys);
@@ -31,21 +33,8 @@ const SourceTree: React.FC<SourceTreeProps> = (props) => {
   }
 
   const renderTitle = (item: TreeItem) => {
-    let menuKeys: BtnStatus[] = [];
-
-    let showMoreBtn = true;
-    if (item.key === '-1' || item.key === '-2') {
-      showMoreBtn = false;
-    } else if (item.key === '0') {
-      menuKeys.push({ key: BTNS_KEY.ADD, disabled: true, title: '新建' });
-    } else {
-      menuKeys = [
-        { key: BTNS_KEY.ADD, disabled: true, title: '新建' },
-        { key: BTNS_KEY.EDIT, disabled: true, title: '重命名' },
-        { key: BTNS_KEY.MOVE, disabled: true, title: '移动到' },
-        { key: BTNS_KEY.DEL, disabled: true, },
-      ];
-    }
+    let menuKeys: BtnStatus[] = genMoreBtns(item.key, item);
+    let showMoreBtn = menuKeys !== undefined && menuKeys !== null && menuKeys.length > 0;
     return (
       <div style={{ display: 'flex', justifyContent: 'space-between', }}>
         <div style={{ marginRight: 20 }}>{item.title}</div>
@@ -53,8 +42,8 @@ const SourceTree: React.FC<SourceTreeProps> = (props) => {
           <OptionDropdown
             menuKeys={menuKeys}
             dataKey={item.key}
-            onItemClick={(key, dataKey) => {
-              console.log(key, dataKey);
+            onItemClick={(dataKey, btnKey) => {
+              onBtnClick(btnKey, item);
             }}
           />
         </div>
@@ -82,7 +71,7 @@ const SourceTree: React.FC<SourceTreeProps> = (props) => {
   return (
     <div>
       <Input.Search
-        style={{ marginBottom: 8 }}
+        style={{ marginBottom: 8, display: needSearch !== undefined && needSearch ? 'block' : 'none' }}
         placeholder="检索"
         onChange={onChange} />
       <Tree
@@ -90,7 +79,18 @@ const SourceTree: React.FC<SourceTreeProps> = (props) => {
         showLine
         showIcon={false}
         switcherIcon={<DownOutlined />}
-        onExpand={(keys: string[] | number[], info) => onExpand(keys)}
+        onExpand={(expandedKeys, info) => {
+          let keys: string[] = [];
+          expandedKeys.forEach(k => {
+            keys.push(k.toString());
+          })
+          onExpand(keys);
+        }}
+        onSelect={(selectedKeys, info) => {
+          if (onSelect && selectedKeys && selectedKeys.length > 0) {
+            onSelect(selectedKeys[0].toString());
+          }
+        }}
         expandedKeys={expandedKeys}
         treeData={renderTree(treeData)}
         autoExpandParent={autoExpandParent}
@@ -102,13 +102,15 @@ const SourceTree: React.FC<SourceTreeProps> = (props) => {
         }}
         description={
           <span>
-            暂无资源数据
+            暂无数据
           </span>
         }
       >
         <Button type="primary"
           onClick={() => {
-            props.onAddClick(0);
+            if (onAddClick) {
+              onAddClick(0);
+            }
           }}
         >
           <PlusOutlined />

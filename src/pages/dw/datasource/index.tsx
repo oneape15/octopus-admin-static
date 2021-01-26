@@ -164,8 +164,8 @@ const DataSourceManagePage: React.FC<{}> = () => {
             { key: BTNS_KEY.SYNC, disabled: true, },
             { key: record.status === 0 ? BTNS_KEY.DISABLED : BTNS_KEY.ENABLE, disabled: true, },
           ]}
-          dataKey={record.id}
-          onItemClick={(key, id) => {
+          dataKey={record.id + ''}
+          onItemClick={(id, key) => {
             switch (key) {
               case BTNS_KEY.EDIT:
                 handleFormVisible(true);
@@ -177,15 +177,15 @@ const DataSourceManagePage: React.FC<{}> = () => {
                 setOptValue(record);
                 break;
               case BTNS_KEY.SYNC:
-                handleSync(id);
+                handleSync(Number(id));
                 break;
               case BTNS_KEY.DISABLED:
-                if (handleStatus(id, 0) && actionRef.current) {
+                if (handleStatus(Number(id), 0) && actionRef.current) {
                   actionRef.current.reload();
                 };
                 break;
               case BTNS_KEY.ENABLE:
-                if (handleStatus(id, 1) && actionRef.current) {
+                if (handleStatus(Number(id), 1) && actionRef.current) {
                   actionRef.current.reload();
                 };
                 break;

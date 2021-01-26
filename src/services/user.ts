@@ -79,3 +79,13 @@ export async function unlockUser(userId: number | string) {
     method: 'POST'
   })
 }
+
+export async function saveUserRole(params: { id: number, roleIds: string[] }) {
+  return request<ApiBody<string>>(
+    `${URI_PREFIX}/saveUserRole`, {
+    method: 'POST',
+    data: {
+      ...params,
+    },
+  });
+}

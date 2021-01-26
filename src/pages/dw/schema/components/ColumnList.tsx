@@ -35,8 +35,8 @@ const ColumnList: React.FC<ColumnListProps> = (props) => {
           menuKeys={[
             { key: BTNS_KEY.EDIT, disabled: true, },
           ]}
-          dataKey={record.id}
-          onItemClick={(key, id) => {
+          dataKey={record.id + ''}
+          onItemClick={(id, key) => {
             switch (key) {
               case BTNS_KEY.EDIT:
                 props.onEdit(record);

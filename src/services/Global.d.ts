@@ -50,3 +50,11 @@ export interface TreeItem {
   isLeaf?: boolean;
   props?: { [key: string]: any | any[] }
 }
+/**
+ * checkbox group Option
+ */
+export interface CheckGroupOption {
+  label: string;
+  value: string;
+  disabled?: boolean;
+}

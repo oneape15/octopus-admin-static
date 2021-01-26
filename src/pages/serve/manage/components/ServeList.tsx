@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
-import { Layout, Button, Menu, Dropdown, Divider, message, Drawer } from 'antd';
+import { Layout, Button, message, } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { ServeItem } from '@/services/serve.d';
 import { queryServe, genGroupTree } from '@/services/serve'
@@ -8,6 +8,7 @@ import style from '../index.less';
 import SourceTree from '@/components/SourceTree';
 import { codeIsOk, buildRequestData } from '@/utils/utils';
 import { TreeItem } from '@/services/Global';
+import { BTNS_KEY, BtnStatus } from '@/components/OptionDropdown';
 
 const { Sider, Content } = Layout;
 
@@ -51,8 +52,28 @@ const ServeList: React.FC<ServeListProps> = (props) => {
     <Layout className={style.serveLayout}>
       <Sider className={style.serveSider} width={240}>
         <SourceTree
-          treeData={treeData ? treeData: []}
+          needSearch={true}
+          treeData={treeData ? treeData : []}
           onAddClick={(pId: number) => props.onAddGroupClick(pId)}
+          onBtnClick={(btnKey, node) => {
+            console.log(btnKey, node);
+          }}
+          genMoreBtns={(nodeKey, node) => {
+            let menuKeys: BtnStatus[] = [];
+            if (nodeKey === '0') {
+              menuKeys.push({ key: BTNS_KEY.ADD, disabled: true, title: '新建' });
+            } else if (nodeKey === '-1' || nodeKey === '-2') {
+              // no any btns
+            } else {
+              menuKeys = [
+                { key: BTNS_KEY.ADD, disabled: true, title: '新建' },
+                { key: BTNS_KEY.EDIT, disabled: true, title: '重命名' },
+                { key: BTNS_KEY.MOVE, disabled: true, title: '移动到' },
+                { key: BTNS_KEY.DEL, disabled: true, },
+              ];
+            }
+            return menuKeys;
+          }}
         />
       </Sider>
       <Content>

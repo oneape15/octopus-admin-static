@@ -54,8 +54,18 @@ export async function getResByRoleId(roleId: number) {
  * Get all role.
  */
 export async function getAllRole() {
-  return request<ApiBody<string>>(
+  return request<ApiBody<RoleItem[]>>(
     `${URI_PREFIX}/all`, {
+    method: 'GET',
+  })
+}
+
+/**
+ * Get role list by user id.
+ */
+export async function getRoleByUserId(userId: number) {
+  return request<ApiBody<RoleItem[]>>(
+    `${URI_PREFIX}/getByUserId/${userId}`, {
     method: 'GET',
   })
 }

@@ -4,18 +4,20 @@ import { Button, Modal, message, } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
 import { requestIsOk, buildRequestData } from '@/utils/utils';
+import {
+  LockOutlined,
+  UnlockOutlined,
+  TeamOutlined,
+} from '@ant-design/icons';
 
 import { UserItem } from '@/services/user.d';
 import { queryUser, saveUser, delUser, lockUser, unlockUser } from '@/services/user';
 import OptionDropdown, { BTNS_KEY } from '@/components/OptionDropdown';
 import UpdateUserForm from './components/UpdateUserForm';
-import {
-  LockOutlined,
-  UnlockOutlined,
-} from '@ant-design/icons';
+import UserRoleDrawer from './components/UserRoleDrawer';
 
 /**
- * add user
+ * save user
  * @param fields 
  */
 const handleSave = async (fields: UserItem) => {
@@ -132,6 +134,7 @@ const UserManagePage: React.FC<{}> = () => {
   const [formVisible, handleFormVisible] = useState<boolean>(false);
   const [delModalVisible, handleDelModalVisible] = useState<boolean>(false);
   const [lockOptVisible, handleLockOptVisible] = useState<boolean>(false);
+  const [userRoleVisible, setUserRoleVisible] = useState<boolean>(false);
   const [isLock, setIsLock] = useState<boolean>(false);
   const [editFlag, setEditFlag] = useState<boolean>(false);
   const [optValue, setOptValue] = useState<UserItem>();
@@ -170,12 +173,13 @@ const UserManagePage: React.FC<{}> = () => {
           menuKeys={[
             { key: BTNS_KEY.EDIT, disabled: true, },
             { key: BTNS_KEY.DEL, disabled: true, },
+            { key: 'setRole', title: '设置角色', disabled: true, icon: <TeamOutlined /> },
             { key: 'lock', title: '锁定', disabled: isNormalStatus(record), icon: <LockOutlined /> },
             { key: 'unlock', title: '解锁', disabled: isLockStatus(record), icon: <UnlockOutlined /> },
           ]}
-          dataKey={record.id}
-          onItemClick={(key, id) => {
-            switch (key) {
+          dataKey={record.id + ''}
+          onItemClick={(dataKey: string, btnKey: string) => {
+            switch (btnKey) {
               case BTNS_KEY.EDIT:
                 handleFormVisible(true);
                 setEditFlag(true);
@@ -183,6 +187,10 @@ const UserManagePage: React.FC<{}> = () => {
                 break;
               case BTNS_KEY.DEL:
                 handleDelModalVisible(true);
+                setOptValue(record);
+                break;
+              case 'setRole':
+                setUserRoleVisible(true);
                 setOptValue(record);
                 break;
               case 'lock':
@@ -273,7 +281,7 @@ const UserManagePage: React.FC<{}> = () => {
           <p>确认删除用户： {optValue?.username}</p>
         </Modal>
       )}
-
+      {/* delete user modal */}
       <Modal
         title={isLock ? '解锁操作' : '锁定操作'}
         visible={lockOptVisible}
@@ -300,6 +308,15 @@ const UserManagePage: React.FC<{}> = () => {
       >
         <p>确定{isLock ? '解锁' : '锁定'}用户：{optValue?.username}</p>
       </Modal>
+      {/* user role set drawer */}
+      <UserRoleDrawer
+        drawerVisible={userRoleVisible}
+        userId={optValue ? optValue.id : -1}
+        onColse={() => {
+          setUserRoleVisible(false);
+          setOptValue(undefined);
+        }}
+      />
 
     </PageContainer>
   );

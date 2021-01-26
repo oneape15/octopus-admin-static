@@ -30,6 +30,7 @@ export default [
       {
         path: '/system/org',
         name: 'org',
+        component: './system/organization'
       },
       {
         path: '/system/resource',

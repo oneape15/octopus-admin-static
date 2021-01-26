@@ -3,49 +3,66 @@ import {
   Modal,
   Input,
   Form,
-  message,
   TreeSelect,
+  message,
 } from 'antd';
 import { DataNode } from 'antd/lib/tree';
-import { genOrgTree } from '@/services/org';
-import { codeIsOk, requestIsOk, buildRequestData } from '@/utils/utils';
-import { UserItem } from '@/services/user.d';
+import { genOrgTree, getOrg } from '@/services/org';
+import { codeIsOk } from '@/utils/utils';
+import { OrgItem } from '@/services/org.d';
 
 const layout = {
   labelCol: { span: 5 },
   wrapperCol: { span: 18 },
 };
 
-export interface RoleFormProps {
-  onCancel: (flag?: boolean, formVals?: UserItem) => void;
-  onSubmit: (values: UserItem) => void;
+export interface OrgFormProps {
+  onCancel: (flag?: boolean, formVals?: OrgItem) => void;
+  onSubmit: (values: OrgItem) => void;
   formVisible: boolean;
   editFlag: boolean;
-  values: Partial<UserItem>;
+  editId?: string;
 }
 
-const UpdateRoleForm: React.FC<RoleFormProps> = (props) => {
+const UpdateOrgForm: React.FC<OrgFormProps> = (props) => {
   const [treeData, setTreeData] = useState<DataNode[]>();
-  const { editFlag, values } = props;
+  const { editFlag, editId } = props;
   const [form] = Form.useForm();
 
+  const getEditOrgInfo = (orgId: string) => {
+    getOrg(orgId).then(apiBody => {
+      const { code, data, msg } = apiBody;
+      if (codeIsOk(code)) {
+        form.setFieldsValue(Object.assign({}, { type: 0 }, data));
+      } else {
+        message.error(msg);
+      }
+    }).catch((err) => {
+      message.error(err);
+    });
+  }
   useEffect(() => {
     form.resetFields();
-    form.setFieldsValue(Object.assign({}, { type: 0 }, values));
-  })
-
-
-  useEffect(() => {
-    refreshTree();
+    if (editId && editId !== null) {
+      if (editFlag) {
+        getEditOrgInfo(editId);
+      } else {
+        form.setFieldsValue({ type: 0, parentId: editId })
+      }
+    } else {
+      form.setFieldsValue({ type: 0 });
+    }
   }, []);
 
-  /**
-   * refresh tree
-   */
-  const refreshTree = () => {
+  useEffect(() => {
+    let disabledKeys: string[] = [];
+    if (editId && editFlag) {
+      disabledKeys.push(editId);
+    }
     genOrgTree({
-      addChildrenSize: false,
-      addRootNode: false
+      addChildrenSize: true,
+      addRootNode: true,
+      disabledKeys,
     }).then((apiBody) => {
       const { code, data, msg } = apiBody;
       if (codeIsOk(code) && data) {
@@ -57,8 +74,7 @@ const UpdateRoleForm: React.FC<RoleFormProps> = (props) => {
     }).catch(err => {
       message.error(err);
     })
-  }
-
+  }, [])
 
   const onChange = (value: any) => {
     console.log(value);
@@ -68,7 +84,7 @@ const UpdateRoleForm: React.FC<RoleFormProps> = (props) => {
     <Modal
       width={440}
       destroyOnClose
-      title={`${editFlag ? '修改' : '添加'}用户`}
+      title={`${editFlag ? '修改' : '添加'}组织`}
       visible={props.formVisible}
       onCancel={() => props.onCancel()}
       onOk={() => {
@@ -84,29 +100,9 @@ const UpdateRoleForm: React.FC<RoleFormProps> = (props) => {
           <Input />
         </Form.Item>
         <Form.Item
-          name="username"
-          label="用户名"
-          rules={[{ required: true, message: '请输入用户名！' }]}
-        >
-          <Input name="username" />
-        </Form.Item>
-        <Form.Item
-          name="email"
-          label="邮箱地址"
-          rules={[{ required: true, message: '请输入有效的邮箱地址！' }]}
-        >
-          <Input name="email" />
-        </Form.Item>
-        <Form.Item
-          name="phone"
-          label="手机号"
-        >
-          <Input name="phone" />
-        </Form.Item>
-        <Form.Item
-          name="deptId"
-          label="所属部门"
-          rules={[{ required: true, message: '请选择父节点！' }]}
+          name="parentId"
+          label="上级部门"
+          rules={[{ required: true, message: '请选择上级部门！' }]}
         >
           <TreeSelect
             showSearch
@@ -120,12 +116,19 @@ const UpdateRoleForm: React.FC<RoleFormProps> = (props) => {
           />
         </Form.Item>
         <Form.Item
-          name="nickname"
-          label="昵称"
+          name="name"
+          label="组织名称"
+          rules={[{ required: true, message: '请输入组织名称！' }]}
         >
-          <Input name="nickname" />
+          <Input name="name" />
         </Form.Item>
-        
+        <Form.Item
+          name="code"
+          label="组织编码"
+          rules={[{ required: true, message: '请输入组织编码！' }]}
+        >
+          <Input name="code" />
+        </Form.Item>
         <Form.Item
           name="comment"
           label="备注信息"
@@ -137,4 +140,4 @@ const UpdateRoleForm: React.FC<RoleFormProps> = (props) => {
   )
 }
 
-export default UpdateRoleForm;
+export default UpdateOrgForm;

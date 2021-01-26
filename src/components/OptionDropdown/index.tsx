@@ -34,8 +34,8 @@ export interface BtnStatus {
 }
 export interface OptionDropdownProps {
   menuKeys: BtnStatus[];
-  dataKey: number | string;
-  onItemClick: (key: string, dataKey: number) => void;
+  dataKey: string;
+  onItemClick: (dataKey: string, btnKey: string) => void;
 }
 
 const OptionDropdown: React.FC<OptionDropdownProps> = (props) => {
@@ -48,7 +48,7 @@ const OptionDropdown: React.FC<OptionDropdownProps> = (props) => {
       domEvent: React.MouseEvent<HTMLElement>;
     }) => {
       const { key } = event;
-      onItemClick(key.toString(), Number(dataKey));
+      onItemClick(dataKey, key.toString());
     },
     [],
   );
